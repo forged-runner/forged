@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101411">
+<meta name="description" content="FORGED – Built by Discipline. Dein persönlicher Laufcoach.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="styles.css">
+<title>FORGED — Built by Discipline</title>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand-mark"><img src="icons/icon-192.png" alt="FORGED Logo"></div>
+  <div class="brand-copy"><strong>FORGED</strong><small>BUILT BY DISCIPLINE.</small></div>
+  <button id="installBtn" class="install-btn" hidden>Installieren</button>
+</header>
+<main>
+  <section class="hero">
+    <div class="eyebrow"><span class="pulse"></span> DEIN ZIEL · MÄRZ 2027</div>
+    <h1>Jeder Lauf.<br><em>Ein Schritt näher.</em></h1>
+    <p>Ascona–Locarno · Zielzeit unter 3:20:00</p>
+    <div class="hero-stats">
+      <div><strong>4:44</strong><small>min/km Zielpace</small></div>
+      <div><strong id="weekKm">0 km</strong><small>diese Woche</small></div>
+      <div><strong id="streak">0 Tage</strong><small>Laufstreak*</small></div>
+    </div>
+    <small class="disclaimer">*Streak zählt nur für protokollierte Läufe. Daten bleiben auf diesem Gerät.</small>
+  </section>
+
+  <nav class="tabs" aria-label="Hauptnavigation">
+    <button class="tab active" data-tab="today">Heute</button>
+    <button class="tab" data-tab="plan">Plan</button>
+    <button class="tab" data-tab="log">Laufprotokoll</button>
+    <button class="tab" data-tab="settings">Daten</button>
+  </nav>
+
+  <section id="today" class="view active">
+    <div class="section-heading"><div><div class="eyebrow">DEIN TAGESPLAN</div><h2 id="todayTitle">Deine Einheit</h2></div><span class="tag" id="dayTag">COACH</span></div>
+    <article class="workout-card">
+      <div class="workout-icon">⚡</div>
+      <div class="workout-body"><div class="workout-type" id="workoutType">Locker laufen</div><h3 id="workoutName">Aerober Dauerlauf</h3><p id="workoutDetails">Ruhig und kontrolliert. Das Tempo richtet sich nach Tagesform.</p><div class="pills"><span id="workoutKm">8–10 km</span><span id="workoutPace">5:15–5:50/km</span></div></div>
+    </article>
+    <div class="section-heading compact"><div><div class="eyebrow">TAGESFORM</div><h2>Wie geht’s dir?</h2></div></div>
+    <div class="readiness-grid">
+      <label>Schlaf<select id="sleep"><option value="good">Gut</option><option value="normal" selected>Normal</option><option value="poor">Schlecht</option></select></label>
+      <label>Müdigkeit<select id="fatigue"><option value="1">1 · Frisch</option><option value="2">2 · Gut</option><option value="3" selected>3 · Normal</option><option value="4">4 · Müde</option><option value="5">5 · Erschöpft</option></select></label>
+      <label>Beschwerden<select id="pain"><option value="none" selected>Keine</option><option value="mild">Leicht</option><option value="high">Deutlich / zunehmend</option></select></label>
+      <label>HRV / Notiz<input id="readinessNote" placeholder="z. B. HRV normal"></label>
+    </div>
+    <button id="adaptBtn" class="btn primary full">Training an Tagesform anpassen</button>
+    <div id="coachAdvice" class="advice"><strong>Coach-Tipp</strong><p>Starte entspannt und bewerte die Belastung nach den ersten 10 Minuten neu.</p></div>
+    <div class="section-heading compact"><div><div class="eyebrow">EINHEIT ERFASST?</div><h2>Lauf eintragen</h2></div></div>
+    <form id="runForm" class="form-card">
+      <div class="form-row"><label>Datum<input id="runDate" type="date" required></label><label>Distanz (km)<input id="runDistance" type="number" min="0.1" max="100" step="0.1" placeholder="10.0" required></label></div>
+      <div class="form-row"><label>Zeit (Minuten, optional)<input id="runMinutes" type="number" min="1" step="0.1" placeholder="z. B. 52"></label><label>Ø HF (optional)<input id="runHr" type="number" min="40" max="230" placeholder="z. B. 138"></label></div>
+      <label>Notiz (optional)<input id="runNote" maxlength="180" placeholder="Beine, Wetter, Gefühl …"></label>
+      <button class="btn primary full" type="submit">Lauf speichern</button>
+    </form>
+    <p class="small-note">Wichtig: Bei deutlichen oder zunehmenden Schmerzen keine Tempoeinheit erzwingen. Streak ist kein Grund, Verletzungen zu riskieren.</p>
+  </section>
+
+  <section id="plan" class="view">
+    <div class="eyebrow">DEIN WEG ZUM ZIEL</div><h2>Trainingsplan</h2>
+    <p class="muted">Ein flexibler Rahmen bis März 2027. Passe die Belastung an deine Erholung an – nicht jede Woche muss härter werden.</p>
+    <div id="planCards" class="plan-list"></div>
+    <div class="notice"><strong>Deine Ausgangslage</strong><p>55–65 km/Woche · Longrun 22–26 km · HM 1:36:00 · Schwelle ca. 4:27–4:33/km.</p><p>Marathon-Zielpace: rund 4:44/km. Bei Hügeln, Hitze oder Müdigkeit nach Anstrengung steuern, nicht starr nach Pace.</p></div>
+    <h3>Vorläufige Trainingsbereiche</h3>
+    <div class="pace-table">
+      <div><span>Regeneration</span><strong>ca. 5:40–6:20/km</strong></div>
+      <div><span>Locker aerob</span><strong>ca. 5:15–5:50/km</strong></div>
+      <div><span>Marathonpace</span><strong>ca. 4:44/km</strong></div>
+      <div><span>Schwelle</span><strong>ca. 4:27–4:33/km</strong></div>
+    </div>
+    <p class="small-note">Das sind Startwerte, keine Pflichtbereiche. Herzfrequenz-Zonen sind hier noch nicht individuell berechnet.</p>
+  </section>
+
+  <section id="log" class="view">
+    <div class="eyebrow">DEIN FORTSCHRITT</div><h2>Laufprotokoll</h2>
+    <div class="log-summary"><div><strong id="totalKm">0 km</strong><small>Gesamtkilometer</small></div><div><strong id="runCount">0</strong><small>Läufe erfasst</small></div><div><strong id="avgKm">0 km</strong><small>Ø je Lauf</small></div></div>
+    <div id="runList" class="run-list"></div>
+    <button id="exportBtn" class="btn secondary full">Backup exportieren (JSON)</button>
+  </section>
+
+  <section id="settings" class="view">
+    <div class="eyebrow">LOKALE DATEN</div><h2>Daten & Garmin</h2>
+    <div class="notice"><strong>Garmin-Synchronisation: noch nicht verbunden</strong><p>Die offizielle Garmin Connect Developer API ist keine einfache private Login-Schnittstelle. Garmin beschreibt sie als Developer-Programm für Business-/Enterprise-Anwendungen mit Prüfung und Freigabe. Diese App fragt weder dein Garmin-Passwort ab noch behauptet sie eine Synchronisation.</p><p>Bis eine offizielle Integration verfügbar und genehmigt ist, kannst du Läufe manuell eintragen. CSV-/FIT-Import ist in dieser ersten Version noch nicht enthalten.</p><a href="https://developer.garmin.com/gc-developer-program/program-faq/" target="_blank" rel="noopener">Garmin-API: offizielle FAQ ↗</a></div>
+    <div class="form-card"><label>Backup wiederherstellen (JSON-Datei)<input id="importFile" type="file" accept=".json,application/json"></label><p class="small-note">Import ersetzt deine gespeicherten Läufe nach Bestätigung. Exportiere zuerst ein Backup.</p></div>
+    <button id="clearBtn" class="btn danger full">Alle lokalen Daten löschen</button>
+    <p class="small-note">Speicherung: Browser-Speicher dieses Geräts (localStorage). Bei Löschen der Browserdaten oder Deinstallation können Daten verloren gehen. Regelmässig Backup exportieren.</p>
+    <div class="version">FORGED · VERSION 0.1.0</div>
+  </section>
+</main>
+<footer>BUILT FOR THE LONG RUN <span>🔥</span></footer>
+<script src="app.js"></script>
+</body>
+</html>
