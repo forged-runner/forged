@@ -1,2 +1,3 @@
-FORGED 1.2 Samsung – Aktualisierung von 1.1.
-Startseite: FIT/TCX/GPX auswählen, explizit analysieren und in Historie speichern. Manuelle Laufeingabe entfernt. Marathon-Datum direkt im Countdown speichern. Startsound entfernt. Orangefarbenes NEU ERSTELLTES Ersatzlogo (Original aus anderem Chat nicht verfügbar). Bestehende localStorage-Daten bleiben bei gleicher GitHub-Pages-Adresse erhalten. Keine direkte Garmin-/Strava-Synchronisation. Vor Update Backup erstellen.
+FORGED 1.3 – Garmin FIT Import Fix
+
+Dateiauswahl startet die Analyse automatisch. Analyse erneut starten über Button. Offline-Cache auf Netzwerk-zuerst aktualisiert. Trainingshistorie bleibt im Browser erhalten. Das Logo ist weiterhin die vorhandene Datei; das freigegebene Original muss separat eingesetzt werden.
