@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#101411">
+<meta name="theme-color" content="#110d0b">
 <meta name="description" content="FORGED – Built by Discipline. Dein persönlicher Laufcoach.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=11">
 <title>FORGED — Built by Discipline</title>
 </head>
 <body>
@@ -22,6 +22,8 @@
     <div class="eyebrow"><span class="pulse"></span> DEIN ZIEL · MÄRZ 2027</div>
     <h1>Jeder Lauf.<br><em>Ein Schritt näher.</em></h1>
     <p>Ascona–Locarno · Zielzeit unter 3:20:00</p>
+    <div class="countdown"><span>MARATHON COUNTDOWN</span><strong id="countdownDays">Datum festlegen</strong><small id="countdownLabel">Renntermin in Einstellungen eintragen</small></div>
+    <button id="soundBtn" class="sound-btn" type="button">▶ FORGED STARTSOUND</button>
     <div class="hero-stats">
       <div><strong>4:44</strong><small>min/km Zielpace</small></div>
       <div><strong id="weekKm">0 km</strong><small>diese Woche</small></div>
@@ -34,7 +36,7 @@
     <button class="tab active" data-tab="today">Heute</button>
     <button class="tab" data-tab="plan">Plan</button>
     <button class="tab" data-tab="log">Laufprotokoll</button>
-    <button class="tab" data-tab="settings">Daten</button>
+    <button class="tab" data-tab="settings">Import & Daten</button>
   </nav>
 
   <section id="today" class="view active">
@@ -52,10 +54,12 @@
     </div>
     <button id="adaptBtn" class="btn primary full">Training an Tagesform anpassen</button>
     <div id="coachAdvice" class="advice"><strong>Coach-Tipp</strong><p>Starte entspannt und bewerte die Belastung nach den ersten 10 Minuten neu.</p></div>
+    <div class="section-heading compact"><div><div class="eyebrow">FORGED ADAPT</div><h2>Keine Zeit für den Plan?</h2></div></div>
+    <div class="form-card"><div class="form-row"><label>Verfügbare Minuten<input id="availableMinutes" type="number" min="0" max="240" value="30"></label><label>Grund<select id="changeReason"><option value="time">Zeitmangel</option><option value="tired">Müdigkeit</option><option value="other">Termin / Alltag</option><option value="pain">Beschwerden</option></select></label></div><button id="proposeBtn" class="btn secondary full" type="button">Neuen Wochenplan vorschlagen</button><div id="proposal" hidden></div></div>
     <div class="section-heading compact"><div><div class="eyebrow">EINHEIT ERFASST?</div><h2>Lauf eintragen</h2></div></div>
     <form id="runForm" class="form-card">
       <div class="form-row"><label>Datum<input id="runDate" type="date" required></label><label>Distanz (km)<input id="runDistance" type="number" min="0.1" max="100" step="0.1" placeholder="10.0" required></label></div>
-      <div class="form-row"><label>Zeit (Minuten, optional)<input id="runMinutes" type="number" min="1" step="0.1" placeholder="z. B. 52"></label><label>Ø HF (optional)<input id="runHr" type="number" min="40" max="230" placeholder="z. B. 138"></label></div>
+      <div class="form-row"><label>Zeit (HH:MM:SS, optional)<input id="runMinutes" type="text" inputmode="numeric" placeholder="00:52:00" pattern="[0-9]{1,3}:[0-5][0-9]:[0-5][0-9]"></label><label>Ø HF (optional)<input id="runHr" type="number" min="40" max="230" placeholder="z. B. 138"></label></div>
       <label>Notiz (optional)<input id="runNote" maxlength="180" placeholder="Beine, Wetter, Gefühl …"></label>
       <button class="btn primary full" type="submit">Lauf speichern</button>
     </form>
@@ -65,7 +69,8 @@
   <section id="plan" class="view">
     <div class="eyebrow">DEIN WEG ZUM ZIEL</div><h2>Trainingsplan</h2>
     <p class="muted">Ein flexibler Rahmen bis März 2027. Passe die Belastung an deine Erholung an – nicht jede Woche muss härter werden.</p>
-    <div id="planCards" class="plan-list"></div>
+    <h3>Die kommenden 14 Tage</h3><div id="weeklyPlan" class="plan-list"></div>
+    <h3>Fixpunkte</h3><div class="notice"><strong>12.12.2026 · Formtest</strong><p>3 km Einlaufen + 21,1 km @ 4:40/km + 2 km Auslaufen. Nur bei ausreichender Erholung; Testcharakter, kein Muss.</p><strong>17.01.2027 · 10-km-Wettkampf</strong><p>Ohne spezielle Vorbereitung, als Standortbestimmung.</p></div><button id="resetPlanBtn" class="btn secondary full">Wochenanpassung zurücksetzen</button><div id="planCards" class="plan-list"></div>
     <div class="notice"><strong>Deine Ausgangslage</strong><p>55–65 km/Woche · Longrun 22–26 km · HM 1:36:00 · Schwelle ca. 4:27–4:33/km.</p><p>Marathon-Zielpace: rund 4:44/km. Bei Hügeln, Hitze oder Müdigkeit nach Anstrengung steuern, nicht starr nach Pace.</p></div>
     <h3>Vorläufige Trainingsbereiche</h3>
     <div class="pace-table">
@@ -80,20 +85,25 @@
   <section id="log" class="view">
     <div class="eyebrow">DEIN FORTSCHRITT</div><h2>Laufprotokoll</h2>
     <div class="log-summary"><div><strong id="totalKm">0 km</strong><small>Gesamtkilometer</small></div><div><strong id="runCount">0</strong><small>Läufe erfasst</small></div><div><strong id="avgKm">0 km</strong><small>Ø je Lauf</small></div></div>
-    <div id="runList" class="run-list"></div>
+    <h3>Leistungsentwicklung</h3><div id="performanceTrend" class="notice"></div><div id="runList" class="run-list"></div>
     <button id="exportBtn" class="btn secondary full">Backup exportieren (JSON)</button>
   </section>
 
   <section id="settings" class="view">
-    <div class="eyebrow">LOKALE DATEN</div><h2>Daten & Garmin</h2>
-    <div class="notice"><strong>Garmin-Synchronisation: noch nicht verbunden</strong><p>Die offizielle Garmin Connect Developer API ist keine einfache private Login-Schnittstelle. Garmin beschreibt sie als Developer-Programm für Business-/Enterprise-Anwendungen mit Prüfung und Freigabe. Diese App fragt weder dein Garmin-Passwort ab noch behauptet sie eine Synchronisation.</p><p>Bis eine offizielle Integration verfügbar und genehmigt ist, kannst du Läufe manuell eintragen. CSV-/FIT-Import ist in dieser ersten Version noch nicht enthalten.</p><a href="https://developer.garmin.com/gc-developer-program/program-faq/" target="_blank" rel="noopener">Garmin-API: offizielle FAQ ↗</a></div>
+    <div class="eyebrow">LOKALE DATEN</div><h2>FORGED ANALYZE</h2>
+    <div class="form-card"><label>Marathondatum (Ascona–Locarno, März 2027)<input type="date" id="raceDate" min="2027-03-01" max="2027-03-31"></label><p class="small-note">Das genaue Renndatum ist noch nicht hinterlegt. Bitte eintragen, damit der Countdown korrekt ist.</p></div>
+    <div class="notice"><strong>Garmin / Strava: Dateiimport</strong><p>Exportiere eine Aktivität als FIT, TCX oder GPX und wähle die Datei hier aus. Die Analyse läuft lokal auf deinem Gerät, ohne Konto-Verknüpfung.</p><p>FIT, TCX und GPX können unterschiedlich viele Messwerte enthalten. Fehlende Herzfrequenz- oder Splitdaten werden nicht erfunden.</p></div>
+    <div class="form-card"><label>Aktivität auswählen (FIT, TCX, GPX)<input id="activityFile" type="file" accept=".fit,.tcx,.gpx,application/gpx+xml,application/xml"></label><div id="activityPreview" class="advice" hidden></div><button id="saveActivityBtn" class="btn primary full" hidden>Analysierten Lauf übernehmen</button></div>
+    <p class="small-note">Keine automatische Garmin- oder Strava-Synchronisation. Lade die Datei in der jeweiligen Plattform herunter und importiere sie hier.</p>
     <div class="form-card"><label>Backup wiederherstellen (JSON-Datei)<input id="importFile" type="file" accept=".json,application/json"></label><p class="small-note">Import ersetzt deine gespeicherten Läufe nach Bestätigung. Exportiere zuerst ein Backup.</p></div>
     <button id="clearBtn" class="btn danger full">Alle lokalen Daten löschen</button>
     <p class="small-note">Speicherung: Browser-Speicher dieses Geräts (localStorage). Bei Löschen der Browserdaten oder Deinstallation können Daten verloren gehen. Regelmässig Backup exportieren.</p>
-    <div class="version">FORGED · VERSION 0.1.0</div>
+    <div class="version">FORGED · VERSION 1.1.0</div>
   </section>
 </main>
 <footer>BUILT FOR THE LONG RUN <span>🔥</span></footer>
-<script src="app.js"></script>
+<script src="activity.js?v=11"></script>
+<script src="app.js?v=11"></script>
+<script src="features.js?v=11"></script>
 </body>
 </html>

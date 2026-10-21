@@ -1,39 +1,18 @@
-# FORGED — Version 0.1.0
+# FORGED 1.1 – BUILT BY DISCIPLINE
 
-Eine installierbare, offlinefähige PWA für Android. Keine Anmeldung und kein Server für deine Trainingsdaten. Die Daten werden im lokalen `localStorage` des Browsers auf dem Gerät gespeichert.
+Samsung PWA, offline-fähig nach dem ersten Laden über HTTPS. Dateien direkt ins bestehende GitHub-Pages-Repository hochladen.
 
-## Funktionen
-- Dunkles Sportdesign, Ziel Ascona–Locarno März 2027 / Sub 3:20
-- Tagesvorschlag und Trainingsphasen
-- Tagesform-Check für Schlaf, Müdigkeit und Beschwerden
-- Manuelles Laufprotokoll mit Wochenkilometern und Streak-Anzeige
-- JSON-Backup exportieren und wieder importieren
-- Offline-Caching nach dem ersten Laden
-- Kein Garmin-Passwort, keine vorgetäuschte Synchronisation
+## Enthalten
+- Schwarz/orangefarbenes Feuerdesign und vorhandenes FORGED-Flammenlogo
+- Kurzer synthetisierter Startsound auf Knopfdruck (Browser erlaubt kein automatisches Audio)
+- Marathon-Countdown: genaues Datum muss in Import & Daten eingetragen werden
+- 14-Tage-Plan mit Distanz und Pace; individuelle HF-Vorgaben sind nicht durchgehend verfügbar
+- FORGED ADAPT mit Vorschlag, Bestätigung und ohne automatisches Nachholen harter Einheiten
+- FORGED ANALYZE: lokaler FIT-/TCX-/GPX-Import mit Splits, Pace, Puls sofern enthalten
+- Lokale Trainingshistorie mit Zeitformat HH:MM:SS und jüngsten Pacewerten
+- Formtest 12.12.2026 und 10-km-Wettkampf 17.01.2027 als Fixpunkte
+- Kein irreführender Synchronisationshinweis; keine automatische Kontosynchronisierung
 
-## Installieren auf Samsung/Android
-Eine PWA kann nicht zuverlässig direkt aus einer lokalen ZIP-Datei installiert werden. Die Dateien müssen über HTTPS gehostet werden.
-
-### Einfacher Weg mit GitHub Pages
-1. Entpacke die ZIP-Datei auf einem Computer.
-2. Melde dich bei GitHub an und erstelle ein neues Repository, z. B. `forged-run`.
-3. Lade `index.html`, `styles.css`, `app.js`, `manifest.webmanifest`, `sw.js` und den Ordner `icons` in das Stammverzeichnis des Repositorys hoch.
-4. In den Repository-Einstellungen unter **Pages** die Veröffentlichung aus dem `main`-Branch und dem Root-Ordner aktivieren.
-5. Öffne die angezeigte HTTPS-Adresse auf dem Samsung-Handy in Chrome.
-6. Im Chrome-Menü **Installieren** oder **Zum Startbildschirm hinzufügen** auswählen.
-
-### Alternative
-Du kannst dieselben Dateien bei einem statischen Hosting-Anbieter veröffentlichen, der HTTPS anbietet. Teile deine persönliche URL nicht öffentlich, wenn du sie privat halten möchtest. Die App enthält selbst keine Server-Synchronisation; die Daten liegen im lokalen Browserprofil.
-
-## Daten und Grenzen
-- Exportiere regelmässig ein JSON-Backup. Löschen der Browserdaten oder Entfernen der App kann lokale Daten löschen.
-- Ein Lauf pro Kalendertag zählt für die Streak. Zusätzliche Läufe am selben Tag zählen nicht als zusätzliche Streak-Tage.
-- Trainingsvorschläge sind ein flexibler Rahmen, kein medizinischer Rat. Bei zunehmenden Schmerzen oder Krankheit nicht durch die Belastung laufen.
-- Die aktuelle Version bietet noch keinen FIT-/CSV-Import und keine automatische Garmin-Synchronisation.
-
-## Garmin API
-Garmin beschreibt seine Connect APIs als Developer-Programm, das für Business-Anwendungen gedacht ist und eine Anfrage/Freigabe benötigt. Eine offizielle Integration braucht eine zugelassene API-Anbindung und typischerweise einen sicheren Server für OAuth/Webhooks. Diese statische lokale App hat keine Garmin-Anbindung. Offizielle FAQ:
-https://developer.garmin.com/gc-developer-program/program-faq/
-
-
-Branding: FORGED — BUILT BY DISCIPLINE. Das Flammenlogo ist in icons/ integriert.
+## Wichtig
+Die App speichert lokal im Browser. Vor dem Aktualisieren JSON-Backup exportieren. Ein GitHub-Upload löscht normalerweise keinen localStorage derselben Domain, aber Backups sind wichtig.
+Die Trainingsempfehlungen sind heuristisch und kein Ersatz für individuelle medizinische oder sportwissenschaftliche Betreuung. FIT-Unterstützung ist auf übliche Record-Felder beschränkt.
