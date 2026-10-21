@@ -12,25 +12,26 @@ function getWeekKm(){const start=weekStart();const end=new Date(start);end.setDa
 function getStreak(){const dates=new Set(state.runs.map(r=>r.date));let d=dateObj(todayISO());if(!dates.has(todayISO()))d.setDate(d.getDate()-1);let n=0;while(dates.has(d.toISOString().slice(0,10))){n++;d.setDate(d.getDate()-1)}return n}
 function workoutForDate(d=new Date()){
  const key=dateKey(d);
+ if(key==='2026-10-22')return {type:'Qualität · vereinbart',name:'6 × 1 km @ 4:30/km',details:'2–3 km einlaufen, 6 × 1 km in 4:30/km mit je 2–3 Min locker traben, 2 km auslaufen. Bei ungewöhnlichen Beschwerden Belastung reduzieren.',distance:'ca. 12–14 km',pace:'Intervalle 4:25–4:35/km · locker 5:40–6:00/km',phase:'base'};
  if(key==='2026-12-12')return {type:'Formtest',name:'3 km + 21,1 km @ 4:40 + 2 km',details:'Nur wenn erholt: langer Formtest im Training, nicht als Pflichtbelastung.',distance:'26,1 km',pace:'Testblock 4:40/km',phase:'test'};
  if(key==='2027-01-17')return {type:'Wettkampf',name:'10-km-Standortbestimmung',details:'Ohne spezielle Vorbereitung; gut einlaufen und nach Tagesform laufen.',distance:'10 km + Ein-/Auslaufen',pace:'Nach Tagesform',phase:'race'};
  const day=(d.getDay()+6)%7;
  const week=Math.floor((d-new Date("2026-10-19T12:00:00"))/(7*86400000));
  const phase= d<new Date("2026-12-01")?"base":d<new Date("2027-02-01")?"build":d<new Date("2027-03-01")?"specific":"taper";
  const items=[
-  ["Regeneration","Sehr lockerer Lauf","Entspannt bleiben. Wenn müde, kurz und sehr ruhig laufen.","5–7 km","5:40–6:20/km"],
-  ["Aerob","Lockerer Dauerlauf","Gesprächstempo; nicht aus einem lockeren Tag ein Tempotraining machen.","8–10 km","5:15–5:50/km"],
+  ["Regeneration","Sehr lockerer Lauf","Entspannt bleiben. Wenn müde, kurz und sehr ruhig laufen.","5–7 km","5:40–6:00/km"],
+  ["Aerob","Lockerer Dauerlauf","Gesprächstempo; nicht aus einem lockeren Tag ein Tempotraining machen.","8–10 km","5:20–5:40/km"],
   ["Qualität","Kontrollierte Qualität","Nur bei guter Tagesform: Einlaufen, kontrollierte Schwellenblöcke, Auslaufen.","10–13 km","Schwelle 4:27–4:33/km"],
-  ["Aerob","Lockerer Dauerlauf","Ruhige aerobe Kilometer. Pace nach Gefühl und Bedingungen.","8–10 km","5:15–5:50/km"],
-  ["Locker + Steigerungen","Laufökonomie","Locker laufen; optional 4–6 kurze, entspannte Steigerungen bei frischen Beinen.","7–9 km","Locker"],
-  ["Longrun","Langer Lauf","Gleichmässig und kontrolliert. Verpflegung bei längeren Läufen testen.","22–26 km","Locker bis moderat"],
-  ["Regeneration","Sehr lockerer Lauf","Kurze regenerative Runde. Keine Intensität nötig.","5–7 km","5:40–6:20/km"]
+  ["Aerob","Lockerer Dauerlauf","Ruhige aerobe Kilometer. Pace nach Gefühl und Bedingungen.","8–10 km","5:20–5:40/km"],
+  ["Locker + Steigerungen","Laufökonomie","Locker laufen; optional 4–6 kurze, entspannte Steigerungen bei frischen Beinen.","7–9 km","5:30–5:50/km"],
+  ["Longrun","Langer Lauf","Gleichmässig und kontrolliert. Verpflegung bei längeren Läufen testen.","22–26 km","5:20–5:40/km"],
+  ["Regeneration","Sehr lockerer Lauf","Kurze regenerative Runde. Keine Intensität nötig.","5–7 km","5:40–6:00/km"]
  ];
  // Rotate to keep the daily pattern; long run Saturday, quality Tuesday.
  const ix=[2,0,1,3,4,5,6][day];
  let w={type:items[ix][0],name:items[ix][1],details:items[ix][2],distance:items[ix][3],pace:items[ix][4]};
  if(phase==="specific"&&day===1){w={type:"Marathonpace",name:"Marathonpace-Blöcke",details:"Nur wenn erholt: kurze kontrollierte Abschnitte nahe Zielpace; keine Pace erzwingen.",distance:"11–14 km",pace:"ca. 4:44/km in Blöcken"}}
- if(phase==="taper"){w={type:"Tapering",name:day===5?"Reduzierter Longrun":"Locker & frisch bleiben",details:"Umfang reduzieren, kurze lockere Läufe erhalten. Keine verpassten Kilometer nachholen.",distance:day===5?"14–18 km":"5–8 km",pace:"Locker"}}
+ if(phase==="taper"){w={type:"Tapering",name:day===5?"Reduzierter Longrun":"Locker & frisch bleiben",details:"Umfang reduzieren, kurze lockere Läufe erhalten. Keine verpassten Kilometer nachholen.",distance:day===5?"14–18 km":"5–8 km",pace:"5:30–5:50/km"}}
  return {...w,phase};
 }
 function showWorkout(){
@@ -74,14 +75,14 @@ $("importFile").addEventListener("change",async e=>{const file=e.target.files[0]
 $("clearBtn").addEventListener("click",()=>{if(confirm("Wirklich alle lokal gespeicherten Läufe und Tagesformdaten löschen? Diese Aktion kann nicht rückgängig gemacht werden.")){state={runs:[],readiness:{},settings:{},overrides:{}};save()}});
 if("serviceWorker" in navigator && location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
 let deferredPrompt;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("installBtn").hidden=false});$("installBtn").addEventListener("click",async()=>{if(!deferredPrompt){alert("Öffne das Browser-Menü und wähle «Installieren» oder «Zum Startbildschirm hinzufügen».");return}deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$("installBtn").hidden=true});
-renderAll();
+// Initial render runs after features.js has loaded.
 
 function dateKey(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function weekDates(){const start=new Date();start.setHours(12,0,0,0);return Array.from({length:14},(_,i)=>{const d=new Date(start);d.setDate(start.getDate()+i);return d})}
 function renderWeek(){if(!$('weeklyPlan'))return;$('weeklyPlan').innerHTML=weekDates().map(d=>{const key=dateKey(d),w=state.overrides?.[key]||workoutForDate(d);return `<div class="week-day ${state.overrides?.[key]?'changed':''}"><strong>${d.toLocaleDateString('de-CH',{weekday:'short',day:'numeric',month:'short'})} · ${escapeHTML(w.type)}</strong><p>${escapeHTML(w.name)} · ${escapeHTML(w.distance)} · ${escapeHTML(w.pace)}</p></div>`}).join('')}
 let pendingProposal=null;
-$('proposeBtn').addEventListener('click',()=>{const mins=Number($('availableMinutes').value),reason=$('changeReason').value;const dates=weekDates(),today=todayISO(),todayIndex=dates.findIndex(d=>dateKey(d)===today);if(todayIndex<0)return;const d=dates[todayIndex],original=state.overrides?.[today]||workoutForDate(d);const serious=reason==='pain';const reduced=mins===0||serious||reason==='tired';const targetKm=Math.max(0,Math.min(12,Math.round(mins/6.2*10)/10));const proposed={...original,type:serious?'Beschwerden – keine Belastung erzwingen':reduced?'Entlastung':'FORGED ADAPT',name:serious?'Erholung / Beschwerden abklären':mins===0?'Heute keine Einheit möglich':`Angepasster lockerer Lauf`,details:serious?'Bei zunehmenden Schmerzen nicht laufen; medizinisch abklären.':`Heute höchstens ${mins} Minuten locker. Verpasste intensive Belastung nicht nachholen.`,distance:mins===0||serious?'0 km (Erholung)':`${targetKm} km (Richtwert)`,pace:'Locker nach Gefühl'};
-const other={};if(!reduced&&/Qualität|Marathonpace/.test(original.type)){const next=dates.slice(todayIndex+1,Math.min(todayIndex+5,dates.length)).find(x=>{const w=state.overrides?.[dateKey(x)]||workoutForDate(x);return /Aerob|Locker/.test(w.type)&&!state.overrides?.[dateKey(x)]});if(next){const key=dateKey(next),w=workoutForDate(next);other[key]={...w,type:'Aerob / optional Qualität',name:'Locker oder verschobene Qualität',details:'Nur falls vollständig erholt und mindestens 48 Stunden Abstand zur nächsten harten Einheit. Sonst locker bleiben.',distance:w.distance,pace:'Nach Erholung'}}}
+$('proposeBtn').addEventListener('click',()=>{const mins=Number($('availableMinutes').value),reason=$('changeReason').value;const dates=weekDates(),today=todayISO(),todayIndex=dates.findIndex(d=>dateKey(d)===today);if(todayIndex<0)return;const d=dates[todayIndex],original=state.overrides?.[today]||workoutForDate(d);const serious=reason==='pain';const reduced=mins===0||serious||reason==='tired';const targetKm=Math.max(0,Math.min(12,Math.round(mins/6.2*10)/10));const proposed={...original,type:serious?'Beschwerden – keine Belastung erzwingen':reduced?'Entlastung':'FORGED ADAPT',name:serious?'Erholung / Beschwerden abklären':mins===0?'Heute keine Einheit möglich':`Angepasster lockerer Lauf`,details:serious?'Bei zunehmenden Schmerzen nicht laufen; medizinisch abklären.':`Heute höchstens ${mins} Minuten locker. Verpasste intensive Belastung nicht nachholen.`,distance:mins===0||serious?'0 km (Erholung)':`${targetKm} km (Richtwert)`,pace:'5:40–6:00/km'};
+const other={};if(!reduced&&/Qualität|Marathonpace/.test(original.type)){const next=dates.slice(todayIndex+1,Math.min(todayIndex+5,dates.length)).find(x=>{const w=state.overrides?.[dateKey(x)]||workoutForDate(x);return /Aerob|Locker/.test(w.type)&&!state.overrides?.[dateKey(x)]});if(next){const key=dateKey(next),w=workoutForDate(next);other[key]={...w,type:'Aerob / optional Qualität',name:'Locker oder verschobene Qualität',details:'Nur falls vollständig erholt und mindestens 48 Stunden Abstand zur nächsten harten Einheit. Sonst locker bleiben.',distance:w.distance,pace:'5:40–6:00/km'}}}
 pendingProposal={today,proposed,other};$('proposal').hidden=false;$('proposal').innerHTML=`<strong>Vorschlag – noch nicht übernommen</strong><p>Heute: ${escapeHTML(proposed.name)}, ${escapeHTML(proposed.distance)}. ${Object.keys(other).length?'Eine spätere Einheit wird als optionale Qualität markiert.':'Keine harte Einheit wird nachgeholt.'} Die tägliche Streak bleibt dein Ziel, aber bei Verletzungszeichen geht Gesundheit vor.</p><button id="confirmProposal" class="btn primary full">Änderung bestätigen</button><button id="rejectProposal" class="btn secondary full" style="margin-top:8px">Verwerfen</button>`;$('confirmProposal').onclick=()=>{state.overrides||={};state.overrides[today]=proposed;Object.assign(state.overrides,other);save();pendingProposal=null;$('proposal').hidden=true;document.querySelector('[data-tab="plan"]').click()};$('rejectProposal').onclick=()=>{pendingProposal=null;$('proposal').hidden=true}});
 $('resetPlanBtn').addEventListener('click',()=>{if(confirm('Alle individuellen Planänderungen zurücksetzen?')){state.overrides={};save()}});
 let pendingActivity=null;

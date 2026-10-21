@@ -13,3 +13,6 @@ function renderExtras(){
 $("raceDate").value=state.settings?.raceDate||"";
 $("saveRaceDate").addEventListener("click",()=>{const value=$("raceDate").value;if(!/^\d{4}-\d{2}-\d{2}$/.test(value)||Number.isNaN(new Date(value+'T12:00:00').getTime())){$("raceDateStatus").textContent="Bitte ein gültiges Datum auswählen.";return}state.settings||={};state.settings.raceDate=value;save();$("raceDateStatus").textContent="Gespeichert: "+fmtDate(value)});
 renderExtras();
+
+// Initialize only after all feature functions have been declared.
+try { renderAll(); } catch (error) { console.error("FORGED startup:", error); const status=document.getElementById("activityStatus"); if(status) status.textContent="Startfehler: "+error.message; }

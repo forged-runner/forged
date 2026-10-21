@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="stylesheet" href="styles.css?v=130">
+<link rel="stylesheet" href="styles.css?v=140">
 <title>FORGED — Built by Discipline</title>
 </head>
 <body>
@@ -56,7 +56,7 @@
     <div class="section-heading compact"><div><div class="eyebrow">FORGED ADAPT</div><h2>Keine Zeit für den Plan?</h2></div></div>
     <div class="form-card"><div class="form-row"><label>Verfügbare Minuten<input id="availableMinutes" type="number" min="0" max="240" value="30"></label><label>Grund<select id="changeReason"><option value="time">Zeitmangel</option><option value="tired">Müdigkeit</option><option value="other">Termin / Alltag</option><option value="pain">Beschwerden</option></select></label></div><button id="proposeBtn" class="btn secondary full" type="button">Neuen Wochenplan vorschlagen</button><div id="proposal" hidden></div></div>
     <div class="section-heading compact"><div><div class="eyebrow">TRAINING IMPORTIEREN</div><h2>FORGED ANALYZE</h2></div></div>
-    <div class="form-card"><p>Garmin- oder Strava-Datei (FIT, TCX oder GPX) auswählen. Die Analyse startet automatisch nach der Dateiauswahl und erscheint hier auf der Startseite.</p><label for="activityFile">Trainingsdatei auswählen</label><input id="activityFile" type="file" accept=".fit,.tcx,.gpx,application/gpx+xml,application/xml"><button id="analyzeActivityBtn" class="btn primary full" type="button">ERNEUT ANALYSIEREN</button><p id="activityStatus" class="small-note" role="status">Noch keine Datei ausgewählt.</p><div id="activityPreview" class="advice" hidden></div><button id="saveActivityBtn" class="btn primary full" type="button" hidden>Training in Historie speichern</button></div>
+    <div class="form-card"><p>Garmin- oder Strava-Datei (FIT, TCX oder GPX) auswählen. Die Analyse startet automatisch nach der Dateiauswahl und erscheint hier auf der Startseite.</p><label for="activityFile">Trainingsdatei auswählen</label><input id="activityFile" type="file" accept=".fit,.tcx,.gpx,application/gpx+xml,application/xml"><button id="analyzeActivityBtn" class="btn primary full" type="button">HOCHLADEN & ANALYSIEREN</button><p id="activityStatus" class="small-note" role="status">Noch keine Datei ausgewählt.</p><div id="activityPreview" class="advice" hidden></div><button id="saveActivityBtn" class="btn primary full" type="button" hidden>Training in Historie speichern</button></div>
     <p class="small-note">Wichtig: Bei deutlichen oder zunehmenden Schmerzen keine Tempoeinheit erzwingen. Streak ist kein Grund, Verletzungen zu riskieren.</p>
   </section>
 
@@ -89,12 +89,12 @@
     <div class="form-card"><label>Backup wiederherstellen (JSON-Datei)<input id="importFile" type="file" accept=".json,application/json"></label><p class="small-note">Import ersetzt deine gespeicherten Läufe nach Bestätigung. Exportiere zuerst ein Backup.</p></div>
     <button id="clearBtn" class="btn danger full">Alle lokalen Daten löschen</button>
     <p class="small-note">Speicherung: Browser-Speicher dieses Geräts (localStorage). Bei Löschen der Browserdaten oder Deinstallation können Daten verloren gehen. Regelmässig Backup exportieren.</p>
-    <div class="version">FORGED · VERSION 1.3</div>
+    <div class="version">FORGED · VERSION 1.4</div>
   </section>
 </main>
 <footer>BUILT FOR THE LONG RUN <span>🔥</span></footer>
-<script src="activity.js?v=130"></script>
-<script src="app.js?v=130"></script>
-<script src="features.js?v=130"></script>
+<script src="activity.js?v=140"></script>
+<script src="app.js?v=140"></script>
+<script src="features.js?v=140"></script>
 </body>
 </html>

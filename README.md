@@ -1,3 +1,1 @@
-FORGED 1.3 – Garmin FIT Import Fix
-
-Dateiauswahl startet die Analyse automatisch. Analyse erneut starten über Button. Offline-Cache auf Netzwerk-zuerst aktualisiert. Trainingshistorie bleibt im Browser erhalten. Das Logo ist weiterhin die vorhandene Datei; das freigegebene Original muss separat eingesetzt werden.
+FORGED 1.4: FIT-Import-Startreihenfolge korrigiert; Analyse-Button; Trainingsplan 22.10.2026 6 × 1 km @ 4:30; Pace-Spannen auf maximal 20 Sekunden begrenzt. Vor Update Backup in App exportieren. Lokale Daten werden nicht serverseitig gespeichert.
