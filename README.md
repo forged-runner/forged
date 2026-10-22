@@ -1,7 +1,5 @@
-FORGED 1.8 – ADAPT & PROGRESSION
+FORGED 1.9.1 – Update-Korrektur
 
-Alle ZIP-Inhalte ins Stammverzeichnis des GitHub-Pages-Repositories laden und bestehende Dateien ersetzen. Vorher JSON-Backup exportieren.
+Alle Dateien im Stammverzeichnis des GitHub-Pages-Repositories ersetzen und Änderungen committen. Anschliessend Website neu öffnen und unter Einstellungen VERSION 1.9.1 prüfen. Backup vor Änderungen exportieren.
 
-Neu: Vierwöchige Schwellenprogression 3×10 / 2×15 / 3×12 / 2×10 Minuten Entlastung, statt ständiger identischer Einheiten. In jeder Karte des 14-Tage-Plans «Diese Einheit passt mir nicht» mit Gründen, Minuten, Notiz, Alternativvorschlag und ausdrücklicher Bestätigung. Änderungen bleiben im lokalen Speicher und im JSON-Backup. Keine ungefragten Änderungen, keine automatischen Verschiebungen harter Einheiten.
-
-Wichtig: Vorschläge sind regelbasiert, keine medizinische Beurteilung. FIT-Analyse aus 1.7 unverändert. Bei Schmerzen nicht auf Streak bestehen.
+Korrigiert: sichtbare Versionsnummer, Skript-Cache-Busting, Service-Worker-Cache-Name und Backup-Versionskennung. Die Trainingslogik entspricht dem 1.9-Fix. Bestehende lokale Plananpassungen bleiben erhalten und können die Anzeige übersteuern.
