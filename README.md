@@ -1,1 +1,1 @@
-FORGED 1.4: FIT-Import-Startreihenfolge korrigiert; Analyse-Button; Trainingsplan 22.10.2026 6 × 1 km @ 4:30; Pace-Spannen auf maximal 20 Sekunden begrenzt. Vor Update Backup in App exportieren. Lokale Daten werden nicht serverseitig gespeichert.
+FORGED 1.5 – Tagesform-Fix. Der Button zeigt jetzt einen Vorschlag mit Bestätigung oder Ablehnung. FIT-Import aus 1.4 bleibt unverändert. Vor Update JSON-Backup exportieren.\n
