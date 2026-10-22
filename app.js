@@ -14,35 +14,41 @@ function workoutForDate(d=new Date()){
  const key=dateKey(d);
  if(key==='2026-10-22')return {type:'Qualität · vereinbart',name:'6 × 1 km @ 4:30/km',details:'2–3 km einlaufen, 6 × 1 km in 4:30/km mit je 2–3 Min locker traben, 2 km auslaufen. Bei ungewöhnlichen Beschwerden Belastung reduzieren.',distance:'ca. 12–14 km',pace:'Intervalle 4:25–4:35/km · locker 5:40–6:00/km',phase:'base'};
  if(key==='2026-12-12')return {type:'Formtest',name:'3 km + 21,1 km @ 4:40 + 2 km',details:'Nur wenn erholt: langer Formtest im Training, nicht als Pflichtbelastung.',distance:'26,1 km',pace:'Testblock 4:40/km',phase:'test'};
+ if(key==='2027-01-16')return {type:'Regeneration',name:'Kurzer Lauf vor dem 10-km-Test',details:'Sehr locker, keine Steigerungen oder Longrun; am Folgetag ist ein Testwettkampf geplant.',distance:'4–5 km',pace:'5:45–6:10/km',purpose:'Frische Beine für die Standortbestimmung am Sonntag.'};
+ if(key==='2027-01-18')return {type:'Regeneration',name:'Erholung nach dem 10-km-Test',details:'Sehr locker und kurz, kein Schwellentraining.',distance:'4–6 km',pace:'5:45–6:10/km',purpose:'Erholung nach dem Wettkampf.'};
+ if(key==='2027-01-19')return {type:'Aerob',name:'Locker statt Schwelle nach dem 10-km-Test',details:'Gesprächstempo, keine Tempoabschnitte.',distance:'6–8 km',pace:'5:30–5:55/km',purpose:'Die 10-km-Standortbestimmung ersetzt diese Woche den Schwellenreiz.'};
  if(key==='2027-01-17')return {type:'Wettkampf',name:'10-km-Standortbestimmung',details:'Ohne spezielle Vorbereitung; gut einlaufen und nach Tagesform laufen.',distance:'10 km + Ein-/Auslaufen',pace:'Nach Tagesform',phase:'race'};
- const day=(d.getDay()+6)%7;
- const week=Math.floor((d-new Date("2026-10-19T12:00:00"))/(7*86400000));
- const phase= d<new Date("2026-12-01")?"base":d<new Date("2027-02-01")?"build":d<new Date("2027-03-01")?"specific":"taper";
- const items=[
-  ["Regeneration","Sehr lockerer Lauf","Entspannt bleiben. Wenn müde, kurz und sehr ruhig laufen.","5–7 km","5:40–6:00/km"],
-  ["Aerob","Lockerer Dauerlauf","Gesprächstempo; nicht aus einem lockeren Tag ein Tempotraining machen.","8–10 km","5:20–5:40/km"],
-  ["Qualität","Kontrollierte Qualität","Nur bei guter Tagesform: Einlaufen, kontrollierte Schwellenblöcke, Auslaufen.","10–13 km","Schwelle 4:27–4:33/km"],
-  ["Aerob","Lockerer Dauerlauf","Ruhige aerobe Kilometer. Pace nach Gefühl und Bedingungen.","8–10 km","5:20–5:40/km"],
-  ["Locker + Steigerungen","Laufökonomie","Locker laufen; optional 4–6 kurze, entspannte Steigerungen bei frischen Beinen.","7–9 km","5:30–5:50/km"],
-  ["Longrun","Langer Lauf","Gleichmässig und kontrolliert. Verpflegung bei längeren Läufen testen.","22–26 km","5:20–5:40/km"],
-  ["Regeneration","Sehr lockerer Lauf","Kurze regenerative Runde. Keine Intensität nötig.","5–7 km","5:40–6:00/km"]
+ const day=(d.getDay()+6)%7; // Montag = 0
+ const week=Math.round((weekStart(d)-new Date("2026-10-19T12:00:00"))/(7*86400000));
+ const phase=d<new Date("2026-12-01")?"base":d<new Date("2027-02-01")?"build":d<new Date("2027-03-01")?"specific":"taper";
+ const cycle=((week%4)+4)%4;
+ // Zuerst den ganzen Wochenrhythmus festlegen: genau ein Qualitätstag,
+ // danach mindestens zwei lockere Tage bis zum Longrun.
+ const easy=(name,dist,pace,why)=>({type:"Aerob",name,details:why,distance:dist,pace,purpose:why});
+ const days=[
+  {type:"Regeneration",name:"Sehr lockerer Lauf",distance:"5–6 km",pace:"5:40–6:05/km",details:"Erholung nach dem langen Lauf; entspannt und ohne Tempozwang.",purpose:"Regeneration nach dem Longrun, damit die Qualitätseinheit am Dienstag sinnvoll möglich wird."},
+  null,
+  easy("Lockerer Dauerlauf","7–8 km","5:25–5:50/km","Aerobe Basis und Erholung nach dem Schwellentag; kein zweites Tempotraining."),
+  easy("Lockerer Dauerlauf","7–8 km","5:20–5:45/km","Grundlagenausdauer aufbauen, ohne die Schwellenbelastung zu wiederholen."),
+  {type:"Locker + Steigerungen",name:"Locker mit optionalen Steigerungen",distance:"5–7 km",pace:"5:30–5:55/km",details:"Optional 4 × 15 Sekunden locker beschleunigen, jeweils vollständig erholen; nur mit frischen Beinen.",purpose:"Laufökonomie erhalten, ohne vor dem Longrun zusätzliche intensive Kilometer anzuhäufen."},
+  {type:"Longrun",name:cycle===3?"Entlasteter langer Lauf":"Langer, lockerer Lauf",distance:cycle===3?"16–19 km":"20–23 km",pace:"5:20–5:45/km",details:"Konstant locker und gesprächsfähig laufen; Verpflegung testen. Keine zusätzlichen Marathonpace-Blöcke in dieser Woche.",purpose:"Marathonspezifische Ausdauer und Ermüdungsresistenz; bei höherer Intensität an anderer Stelle Belastung reduzieren."},
+  {type:"Regeneration",name:"Kurzer Erholungslauf",distance:"4–6 km",pace:"5:45–6:10/km",details:"Sehr locker, keine Tempoabschnitte.",purpose:"Aktive Erholung nach dem Longrun und Vorbereitung der nächsten Trainingswoche."}
  ];
- // Rotate to keep the daily pattern; long run Saturday, quality Tuesday.
- const ix=[2,0,1,3,4,5,6][day];
- let w={type:items[ix][0],name:items[ix][1],details:items[ix][2],distance:items[ix][3],pace:items[ix][4]};
- // Vierwöchige Schwellenprogression: drei Aufbauwochen, eine Entlastungswoche.
- if(day===1 && phase!=="taper" && phase!=="specific"){
-  const cycle=((week%4)+4)%4;
-  const steps=[
-   ["3 × 10 Min. Schwelle", "3 × 10 Min. @ 4:27–4:33/km, 3 Min. lockere Trabpause; 2–3 km einlaufen und 2 km auslaufen.","11–13 km","4:27–4:33/km","30 Minuten kontrollierte Schwellenarbeit als Ausgangswert. Vergleiche Pace, Puls und Belastungsgefühl mit späteren Wochen."],
-   ["2 × 15 Min. Schwelle", "2 × 15 Min. @ 4:30–4:35/km, 3 Min. lockere Trabpause; 2–3 km einlaufen und 2 km auslaufen.","11–13 km","4:30–4:35/km","Gleiche Gesamtdauer mit längeren zusammenhängenden Blöcken: verbessert Tempokonstanz für 4:44/km im Marathon."],
-   ["3 × 12 Min. Schwelle", "3 × 12 Min. @ 4:27–4:33/km, 3 Min. lockere Trabpause; 2–3 km einlaufen und 2 km auslaufen.","12–14 km","4:27–4:33/km","Steigert die kontrollierte Schwellenzeit auf 36 Minuten, sofern die bisherigen Wochen gut vertragen wurden."],
-   ["2 × 10 Min. Schwelle · Entlastung", "2 × 10 Min. @ 4:30–4:35/km, 3 Min. lockere Trabpause; 2 km einlaufen und 2 km auslaufen.","9–11 km","4:30–4:35/km","Reduziert den Umfang der intensiven Arbeit, damit der Trainingsreiz verarbeitet wird. Kein Nachholen verpasster Wiederholungen."]
-  ];
-  const q=steps[cycle];w={type:"Schwelle",name:q[0],details:q[1],distance:q[2],pace:q[3],purpose:q[4]};
+ const steps=[
+  ["3 × 10 Min. Schwelle","3 × 10 Min. @ 4:27–4:33/km; zwischen den Blöcken je 3 Min. sehr locker traben (ca. 5:50–6:30/km); 2–3 km einlaufen, 2 km auslaufen.","10–12 km","4:27–4:33/km","30 Minuten Schwellenarbeit; Belastungsgefühl und Puls dokumentieren, um die nächste Woche sinnvoll zu steuern."],
+  ["2 × 15 Min. Schwelle","2 × 15 Min. @ 4:30–4:35/km; dazwischen 3 Min. sehr locker traben (ca. 5:50–6:30/km); 2–3 km einlaufen, 2 km auslaufen.","10–12 km","4:30–4:35/km","30 Minuten Schwelle in längeren Blöcken; kein zusätzlicher Schwellentag."],
+  ["3 × 12 Min. Schwelle","3 × 12 Min. @ 4:27–4:33/km; dazwischen je 3 Min. sehr locker traben (ca. 5:50–6:30/km); 2–3 km einlaufen, 2 km auslaufen.","11–13 km","4:27–4:33/km","36 Minuten Schwelle nur nach gut vertragenen Vorwochen; andernfalls die Vorwoche wiederholen oder entlasten."],
+  ["2 × 10 Min. Schwelle · Entlastung","2 × 10 Min. @ 4:30–4:35/km; 3 Min. sehr locker traben; 2 km einlaufen, 2 km auslaufen.","8–10 km","4:30–4:35/km","Entlastungswoche: weniger intensive Minuten und kürzerer Longrun; nichts nachholen."]
+ ];
+ const q=steps[cycle];
+ days[1]={type:"Schwelle",name:q[0],details:q[1],distance:q[2],pace:q[3],purpose:q[4]};
+ if(phase==="specific")days[1]={type:"Marathonpace",name:"Kontrollierte Marathonpace-Blöcke",details:"2–3 km einlaufen, 2 × 3 km nahe 4:44/km, dazwischen 1 km locker, 2 km auslaufen. Nur bei guter Erholung; keine zusätzliche Schwelle.",distance:"11–13 km",pace:"Blöcke ca. 4:44/km",purpose:"Zielpace ökonomisch einüben, ohne mehrere harte Tage zu stapeln."};
+ if(phase==="taper"){
+  days[1]={type:"Locker + kurzer Reiz",name:"Locker mit kurzen Marathonpace-Abschnitten",details:"2 km locker, 2 × 5 Minuten bei Marathonpace mit 3 Minuten locker dazwischen, locker auslaufen; bei Müdigkeit ganz locker.",distance:"6–8 km",pace:"Locker, kurz ca. 4:44/km",purpose:"Bewegungsgefühl erhalten, ohne neue Ermüdung aufzubauen."};
+  days[5]={type:"Tapering",name:"Reduzierter langer Lauf",details:"Locker und ohne Endbeschleunigung.",distance:"12–16 km",pace:"5:30–5:55/km",purpose:"Erholung vor dem Rennen."};
  }
- if(phase==="specific"&&day===1){w={type:"Marathonpace",name:"Marathonpace-Blöcke",details:"Nur wenn erholt: kurze kontrollierte Abschnitte nahe Zielpace; keine Pace erzwingen.",distance:"11–14 km",pace:"ca. 4:44/km in Blöcken"}}
- if(phase==="taper"){w={type:"Tapering",name:day===5?"Reduzierter Longrun":"Locker & frisch bleiben",details:"Umfang reduzieren, kurze lockere Läufe erhalten. Keine verpassten Kilometer nachholen.",distance:day===5?"14–18 km":"5–8 km",pace:"5:30–5:50/km"}}
+ let w=days[day];
+
  return {...w,phase};
 }
 function showWorkout(){
