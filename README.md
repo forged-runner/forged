@@ -1,1 +1,1 @@
-FORGED 1.5 – Tagesform-Fix. Der Button zeigt jetzt einen Vorschlag mit Bestätigung oder Ablehnung. FIT-Import aus 1.4 bleibt unverändert. Vor Update JSON-Backup exportieren.\n
+FORGED 1.6: Trainingszweck je Plan-Einheit; FIT-Import mit Garmin-HF-Zonen; subjektive Anstrengung, Coach-Kommentar und Belastungs-Schätzwert. Präzise automatische Lap-/Intervall-Erkennung ist noch nicht implementiert. Vor Update JSON-Backup exportieren.
