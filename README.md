@@ -1,7 +1,7 @@
-FORGED 1.7 – ANALYZE PRO
+FORGED 1.8 – ADAPT & PROGRESSION
 
-Alle Dateien aus diesem ZIP direkt in das Stammverzeichnis des bestehenden GitHub-Pages-Repositories hochladen (index.html, app.js, activity.js, analyze-pro.js, features.js, styles.css, sw.js, manifest.webmanifest und icons/). Bestehende Dateien ersetzen; keine zweite Unterordner-Ebene anlegen.
+Alle ZIP-Inhalte ins Stammverzeichnis des GitHub-Pages-Repositories laden und bestehende Dateien ersetzen. Vorher JSON-Backup exportieren.
 
-NEU: Soll-Ist-Bewertung, heuristische Erkennung schneller 1-km-Abschnitte (nicht mit echten Garmin-Laps gleichzusetzen), individuelle Garmin-HF-Zonen, RPE/Beingefühl/Notizen, Coach-Fazit. Gesamte Analyse wird beim Klick auf „Training in Historie speichern“ im Laufprotokoll abgelegt und im JSON-Backup mitgesichert. Bereits vorhandene Laufprotokoll-Einträge erhalten nicht nachträglich Analysen; FIT-Datei bei Bedarf erneut importieren.
+Neu: Vierwöchige Schwellenprogression 3×10 / 2×15 / 3×12 / 2×10 Minuten Entlastung, statt ständiger identischer Einheiten. In jeder Karte des 14-Tage-Plans «Diese Einheit passt mir nicht» mit Gründen, Minuten, Notiz, Alternativvorschlag und ausdrücklicher Bestätigung. Änderungen bleiben im lokalen Speicher und im JSON-Backup. Keine ungefragten Änderungen, keine automatischen Verschiebungen harter Einheiten.
 
-WICHTIG: Zuerst JSON-Backup erstellen. Die automatische Abschnittserkennung basiert auf Distanz und Zeit, kann bei GPS-Ungenauigkeit oder unregelmässigen Intervallen Fehler machen. Kein Cloud-Upload, Daten verbleiben lokal im Browser. Keine vollautomatische Trainingsplan-Anpassung.
+Wichtig: Vorschläge sind regelbasiert, keine medizinische Beurteilung. FIT-Analyse aus 1.7 unverändert. Bei Schmerzen nicht auf Streak bestehen.
