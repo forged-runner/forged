@@ -1,8 +1,9 @@
 const KEY="marathonCoachV1";
 const $=id=>document.getElementById(id);
 const todayISO=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
-let state={runs:[],readiness:{},settings:{},overrides:{}};
+let state={runs:[],readiness:{},settings:{raceDate:"2027-03-07"},overrides:{}};
 try{const saved=JSON.parse(localStorage.getItem(KEY)||"null");if(saved&&Array.isArray(saved.runs))state={...state,...saved,overrides:saved.overrides||{}}}catch(e){}
+state.settings=state.settings||{};if(!state.settings.raceDate)state.settings.raceDate="2027-03-07";
 function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
 function dateObj(s){return new Date(s+"T12:00:00")}
 function fmtDate(s){return dateObj(s).toLocaleDateString("de-CH",{day:"2-digit",month:"short",year:"numeric"})}
@@ -11,45 +12,41 @@ function weekStart(d=new Date()){const x=new Date(d);x.setHours(12,0,0,0);x.setD
 function getWeekKm(){const start=weekStart();const end=new Date(start);end.setDate(end.getDate()+7);return state.runs.filter(r=>dateObj(r.date)>=start&&dateObj(r.date)<end).reduce((s,r)=>s+Number(r.distance),0)}
 function getStreak(){const dates=new Set(state.runs.map(r=>r.date));let d=dateObj(todayISO());if(!dates.has(todayISO()))d.setDate(d.getDate()-1);let n=0;while(dates.has(d.toISOString().slice(0,10))){n++;d.setDate(d.getDate()-1)}return n}
 function workoutForDate(d=new Date()){
- const key=dateKey(d);
- if(key==='2026-10-22')return {type:'Qualität · vereinbart',name:'6 × 1 km @ 4:30/km',details:'2–3 km einlaufen, 6 × 1 km in 4:30/km mit je 2–3 Min locker traben, 2 km auslaufen. Bei ungewöhnlichen Beschwerden Belastung reduzieren.',distance:'ca. 12–14 km',pace:'Intervalle 4:25–4:35/km · locker 5:40–6:00/km',phase:'base'};
- if(key==='2026-12-12')return {type:'Formtest',name:'3 km + 21,1 km @ 4:40 + 2 km',details:'Nur wenn erholt: langer Formtest im Training, nicht als Pflichtbelastung.',distance:'26,1 km',pace:'Testblock 4:40/km',phase:'test'};
- if(key==='2027-01-16')return {type:'Regeneration',name:'Kurzer Lauf vor dem 10-km-Test',details:'Sehr locker, keine Steigerungen oder Longrun; am Folgetag ist ein Testwettkampf geplant.',distance:'4–5 km',pace:'5:45–6:10/km',purpose:'Frische Beine für die Standortbestimmung am Sonntag.'};
- if(key==='2027-01-18')return {type:'Regeneration',name:'Erholung nach dem 10-km-Test',details:'Sehr locker und kurz, kein Schwellentraining.',distance:'4–6 km',pace:'5:45–6:10/km',purpose:'Erholung nach dem Wettkampf.'};
- if(key==='2027-01-19')return {type:'Aerob',name:'Locker statt Schwelle nach dem 10-km-Test',details:'Gesprächstempo, keine Tempoabschnitte.',distance:'6–8 km',pace:'5:30–5:55/km',purpose:'Die 10-km-Standortbestimmung ersetzt diese Woche den Schwellenreiz.'};
- if(key==='2027-01-17')return {type:'Wettkampf',name:'10-km-Standortbestimmung',details:'Ohne spezielle Vorbereitung; gut einlaufen und nach Tagesform laufen.',distance:'10 km + Ein-/Auslaufen',pace:'Nach Tagesform',phase:'race'};
- const day=(d.getDay()+6)%7; // Montag = 0
- const week=Math.round((weekStart(d)-new Date("2026-10-19T12:00:00"))/(7*86400000));
- const phase=d<new Date("2026-12-01")?"base":d<new Date("2027-02-01")?"build":d<new Date("2027-03-01")?"specific":"taper";
- const cycle=((week%4)+4)%4;
- // Zuerst den ganzen Wochenrhythmus festlegen: genau ein Qualitätstag,
- // danach mindestens zwei lockere Tage bis zum Longrun.
- const easy=(name,dist,pace,why)=>({type:"Aerob",name,details:why,distance:dist,pace,purpose:why});
- const days=[
-  {type:"Regeneration",name:"Sehr lockerer Lauf",distance:"5–6 km",pace:"5:40–6:05/km",details:"Erholung nach dem langen Lauf; entspannt und ohne Tempozwang.",purpose:"Regeneration nach dem Longrun, damit die Qualitätseinheit am Dienstag sinnvoll möglich wird."},
-  null,
-  easy("Lockerer Dauerlauf","7–8 km","5:25–5:50/km","Aerobe Basis und Erholung nach dem Schwellentag; kein zweites Tempotraining."),
-  easy("Lockerer Dauerlauf","7–8 km","5:20–5:45/km","Grundlagenausdauer aufbauen, ohne die Schwellenbelastung zu wiederholen."),
-  {type:"Locker + Steigerungen",name:"Locker mit optionalen Steigerungen",distance:"5–7 km",pace:"5:30–5:55/km",details:"Optional 4 × 15 Sekunden locker beschleunigen, jeweils vollständig erholen; nur mit frischen Beinen.",purpose:"Laufökonomie erhalten, ohne vor dem Longrun zusätzliche intensive Kilometer anzuhäufen."},
-  {type:"Longrun",name:cycle===3?"Entlasteter langer Lauf":"Langer, lockerer Lauf",distance:cycle===3?"16–19 km":"20–23 km",pace:"5:20–5:45/km",details:"Konstant locker und gesprächsfähig laufen; Verpflegung testen. Keine zusätzlichen Marathonpace-Blöcke in dieser Woche.",purpose:"Marathonspezifische Ausdauer und Ermüdungsresistenz; bei höherer Intensität an anderer Stelle Belastung reduzieren."},
-  {type:"Regeneration",name:"Kurzer Erholungslauf",distance:"4–6 km",pace:"5:45–6:10/km",details:"Sehr locker, keine Tempoabschnitte.",purpose:"Aktive Erholung nach dem Longrun und Vorbereitung der nächsten Trainingswoche."}
- ];
- const steps=[
-  ["3 × 10 Min. Schwelle","3 × 10 Min. @ 4:27–4:33/km; zwischen den Blöcken je 3 Min. sehr locker traben (ca. 5:50–6:30/km); 2–3 km einlaufen, 2 km auslaufen.","10–12 km","4:27–4:33/km","30 Minuten Schwellenarbeit; Belastungsgefühl und Puls dokumentieren, um die nächste Woche sinnvoll zu steuern."],
-  ["2 × 15 Min. Schwelle","2 × 15 Min. @ 4:30–4:35/km; dazwischen 3 Min. sehr locker traben (ca. 5:50–6:30/km); 2–3 km einlaufen, 2 km auslaufen.","10–12 km","4:30–4:35/km","30 Minuten Schwelle in längeren Blöcken; kein zusätzlicher Schwellentag."],
-  ["3 × 12 Min. Schwelle","3 × 12 Min. @ 4:27–4:33/km; dazwischen je 3 Min. sehr locker traben (ca. 5:50–6:30/km); 2–3 km einlaufen, 2 km auslaufen.","11–13 km","4:27–4:33/km","36 Minuten Schwelle nur nach gut vertragenen Vorwochen; andernfalls die Vorwoche wiederholen oder entlasten."],
-  ["2 × 10 Min. Schwelle · Entlastung","2 × 10 Min. @ 4:30–4:35/km; 3 Min. sehr locker traben; 2 km einlaufen, 2 km auslaufen.","8–10 km","4:30–4:35/km","Entlastungswoche: weniger intensive Minuten und kürzerer Longrun; nichts nachholen."]
- ];
- const q=steps[cycle];
- days[1]={type:"Schwelle",name:q[0],details:q[1],distance:q[2],pace:q[3],purpose:q[4]};
- if(phase==="specific")days[1]={type:"Marathonpace",name:"Kontrollierte Marathonpace-Blöcke",details:"2–3 km einlaufen, 2 × 3 km nahe 4:44/km, dazwischen 1 km locker, 2 km auslaufen. Nur bei guter Erholung; keine zusätzliche Schwelle.",distance:"11–13 km",pace:"Blöcke ca. 4:44/km",purpose:"Zielpace ökonomisch einüben, ohne mehrere harte Tage zu stapeln."};
- if(phase==="taper"){
-  days[1]={type:"Locker + kurzer Reiz",name:"Locker mit kurzen Marathonpace-Abschnitten",details:"2 km locker, 2 × 5 Minuten bei Marathonpace mit 3 Minuten locker dazwischen, locker auslaufen; bei Müdigkeit ganz locker.",distance:"6–8 km",pace:"Locker, kurz ca. 4:44/km",purpose:"Bewegungsgefühl erhalten, ohne neue Ermüdung aufzubauen."};
-  days[5]={type:"Tapering",name:"Reduzierter langer Lauf",details:"Locker und ohne Endbeschleunigung.",distance:"12–16 km",pace:"5:30–5:55/km",purpose:"Erholung vor dem Rennen."};
+ const key=dateKey(d), day=(d.getDay()+6)%7;
+ const week=Math.round((weekStart(d)-new Date('2026-10-19T12:00:00'))/(7*86400000));
+ const phase=d<new Date('2026-12-13')?'base':d<new Date('2027-01-18')?'build':d<new Date('2027-02-15')?'specific':'taper';
+ const block=Math.max(0,Math.floor((week-1)/4)), cycle=((week-1)%4+4)%4;
+ const recovery=cycle===3;
+ const baseKm=recovery?[6,8,8,7,6,18,5]:[6,11,9,10,7,24,5]; // 58 / 72 km
+ const mk=(type,name,distance,pace,details,purpose)=>({type,name,distance:`${distance} km`,pace,details,purpose,phase});
+ const easy=(n,km,why,slow=false)=>mk(slow?'Regeneration':'Aerob',n,km,slow?'5:40–6:10/km':'5:20–5:55/km',`Durchgehend gesprächsfähig laufen. ${why}`,`${why} Schafft aerobe Ausdauer und ermöglicht Anpassung für das Ziel sub 3:20.`);
+ let days=[easy('Erholung nach Longrun',baseKm[0],'Sehr locker, kein Tempodruck.',true),null,easy('Lockerer Dauerlauf',baseKm[2],'Keine zweite Qualitätseinheit.'),easy('Aerober Dauerlauf',baseKm[3],'Konstant locker, kontrollierte Atmung.'),easy('Locker vor Longrun',baseKm[4],'Optional 4 × 15 Sekunden lockere Steigerungen nur bei frischen Beinen.'),mk('Longrun',recovery?'Entlasteter Longrun':'Langer lockerer Lauf',baseKm[5],'5:20–5:55/km','Durchgehend locker, Verpflegung und Trinken erproben; keine unvorhergesehenen Tempoblöcke.','Marathonspezifische Ausdauer und Ermüdungsresistenz.'),easy('Kurzer Regenerationslauf',baseKm[6],'Nach dem Longrun ganz locker.',true)];
+ if(cycle===0){
+  if(block===0)days[1]=mk('Bergintervalle','8 × 45 Sekunden bergauf',baseKm[1],'Bergauf RPE 7/10','3 km einlaufen; 8 × 45 Sekunden bei ca. 4–6 % Steigung, je 2–3 Minuten locker bergab erholen; restliche Kilometer locker auslaufen. Kein Sprint.','Anderer Reiz als die 6 × 1 km am 22.10.; Kraftausdauer und Laufökonomie.');
+  else days[1]=mk('Intervalle',block%2?'5 × 1 km kontrolliert':'6 × 3 Minuten flott',baseKm[1],block%2?'4:25–4:35/km':'ca. 4:20–4:30/km','2–3 km einlaufen, 5 × 1 km mit 2:30 Min Trabpause bzw. 6 × 3 Min mit 2 Min Trabpause; locker auslaufen. Bei Ermüdung weniger Wiederholungen.','Gezielter Schnelligkeitsreiz mit ausreichendem Abstand zu Schwellenwochen.');
+ }else if(cycle===1){
+  const variants=[['3 × 10 Minuten Schwelle','3 × 10 Min @ 4:27–4:33/km; 3 Min sehr locker traben zwischen den Blöcken.'],['2 × 15 Minuten Schwelle','2 × 15 Min @ 4:28–4:35/km; 3 Min sehr locker traben.'],['3 × 12 Minuten Schwelle','3 × 12 Min @ 4:28–4:35/km; je 3 Min sehr locker traben.'],['2 × 18 Minuten Schwelle','2 × 18 Min @ 4:30–4:35/km; 4 Min sehr locker traben.']];
+  const v=variants[Math.min(block,3)];days[1]=mk('Schwelle',v[0],baseKm[1],'4:27–4:35/km',`2–3 km einlaufen; ${v[1]} Danach locker auslaufen bis zur Tagesdistanz. Bei Müdigkeit auf 2 × 10 Min kürzen.`,`Schwellenprogression, Stufe ${Math.min(block+1,4)}; die längeren Blöcke werden nur nach guter Verträglichkeit gesteigert.`);
+ }else if(cycle===2){
+  if(phase==='specific'||phase==='build')days[1]=mk('Marathonpace','2 × 3 km Marathonpace',baseKm[1],'4:44/km','2 km einlaufen, 2 × 3 km @ 4:44/km mit 1 km locker dazwischen, bis zur Tagesdistanz locker auslaufen.','Ökonomisches Laufen im geplanten Marathonrenntempo; keine zusätzliche Schwelle.');
+  else days[1]=easy('Mittellanger aerober Lauf',baseKm[1],'Bewusst keine harte Einheit; Grundlage festigen.');
+ }else days[1]=easy('Entlastender Dauerlauf',baseKm[1],'Entlastungswoche: keine harte Einheit.',true);
+ if(phase==='specific'&&!recovery&&cycle===2){days[5]=mk('Longrun','Longrun mit dosierter Marathonpace',24,'5:20–5:55/km, MP 4:44/km','16 km locker, dann 2 × 3 km @ 4:44/km mit 1 km locker dazwischen, verbleibend locker. Nur bei guter Erholung; sonst 24 km locker.','Marathonspezifische Ausdauer; Dienstagslauf bleibt in dieser Woche locker.');days[1]=easy('Aerob statt zweiter Qualität',11,'Der Longrun trägt diese Woche die einzige harte Belastung.');}
+ if(phase==='taper'){
+  const daysToRace=Math.round((dateObj('2027-03-07')-d)/86400000);
+  if(daysToRace>=14){days=[easy('Regeneration',6,'Sehr locker.',true),mk('Marathonpace','2 × 2 km Marathonpace',10,'4:44/km','3 km locker, 2 × 2 km @ 4:44/km mit 1 km Trabpause, restliche Strecke locker.','Kurzer kontrollierter Reiz bei sinkendem Umfang.'),easy('Locker',8,'Taper: Umfang senken.'),easy('Aerob',9,'Frische bewahren.'),easy('Locker',6,'Keine Ermüdung aufbauen.'),mk('Longrun','Letzter reduzierter Longrun',18,'5:25–5:55/km','Locker, ohne Endbeschleunigung.','Erhaltung der Ausdauer bei abnehmender Ermüdung.'),easy('Regeneration',5,'Locker erholen.',true)];}
+  else if(daysToRace>=7){days=[easy('Regeneration',5,'Frische aufbauen.',true),mk('Marathonpace','3 × 1 km Marathonpace',8,'4:44/km','2 km einlaufen; 3 × 1 km @ 4:44/km mit 500 m Trabpause; locker auslaufen.','Rhythmus bewahren, keine Ermüdung.'),easy('Locker',7,'Taper.',true),easy('Locker',7,'Taper.'),easy('Locker',5,'Taper.',true),mk('Longrun','Kurzer lockerer Lauf',12,'5:30–6:00/km','Kein Tempo.','Bewegung erhalten.'),easy('Regeneration',4,'Sehr locker.',true)];}
+  else {days=[easy('Sehr locker',5,'Rennwoche.',true),mk('Aktivierung','4 × 1 Minute kontrolliert',6,'etwa Marathonpace','2 km locker, 4 × 1 Min @ Marathonpace mit 2 Min locker, auslaufen. Kein harter Reiz.','Locker bleiben.'),easy('Locker',6,'Rennwoche.',true),easy('Locker',5,'Rennwoche.',true),easy('Locker',4,'Rennwoche.',true),easy('Optionaler Shakeout',3,'Nur falls erholsam.',true),mk('Wettkampf','Ascona-Locarno Marathon',42.195,'ca. 4:44/km','Ruhiger Start, gleichmässige Verpflegung, Ziel sub 3:20.','Saisonhöhepunkt.')];}
  }
- let w=days[day];
-
- return {...w,phase};
+ if(key==='2027-03-07')return mk('Wettkampf','Ascona-Locarno Marathon',42.195,'ca. 4:44/km','Kontrollierter Start, gleichmässige Verpflegung; Ziel sub 3:20.','Saisonhöhepunkt.');
+ if(key>='2026-12-07'&&key<='2026-12-11'&&day===1)return easy('Locker vor Testlauf',9,'Kein zusätzliches Schwellentraining in der Testwoche.');
+ if(key==='2026-12-13'||key==='2026-12-14')return easy('Erholung nach Testlauf',5,'Nur sehr locker; bei Beschwerden Belastung aussetzen.',true);
+ if(key>='2027-01-11'&&key<='2027-01-16'&&day===1)return easy('Locker vor 10-km-Wettkampf',9,'Kein zusätzliches Schwellentraining in der Wettkampfwoche.');
+ if(key==='2026-10-22')return mk('Qualität · absolviert','6 × 1 km @ 4:30/km',12,'4:30/km','Bereits absolvierte Intervalle; nicht erneut als offene Trainingseinheit interpretieren.','Vorbelastung für die Planung am 27.10.');
+ if(key==='2026-12-12')return mk('Optionaler Formtest','21–25 km @ ca. 4:40/km nur nach Freigabe',25,'ca. 4:40/km','Hohe Belastung! Nur bei guter Erholung und bewusster Bestätigung durchführen; ansonsten lockerer Longrun. Keine weiteren harten Einheiten in derselben Woche.','Marathonspezifische Standortbestimmung, nicht verpflichtend.');
+ if(key==='2027-01-17')return mk('Optionaler Formtest','10-km-Wettkampf',12,'nach Tagesform','2 km einlaufen, 10 km nach Tagesform; anschliessend auslaufen nach Bedarf.','Bestätigter Wettkampf als Standortbestimmung.');
+ if(key==='2027-01-16'||key==='2027-01-18'||key==='2027-01-19')return easy('Locker rund um möglichen 10-km-Test',key==='2027-01-16'?5:6,'Keine Qualität unmittelbar vor oder nach einem bestätigten Test.',true);
+ return days[day];
 }
 function showWorkout(){
  const w=state.overrides?.[todayISO()]||workoutForDate();
@@ -71,10 +68,10 @@ function advice(){
 }
 function renderPlan(){
  const phases=[
- ["Grundlage stabilisieren","19. Okt – Nov 2026","55–65 km/Woche als Ausgangspunkt. Lockeres Volumen, eine kontrollierte Qualitätseinheit und Longrun 22–26 km; bei Müdigkeit entlasten.","55–65 km/Woche"],
- ["Aufbau & Schwelle","Dez 2026 – Jan 2027","Schwellenblöcke schrittweise ausbauen und Marathonpace dosiert integrieren. Alle 3–4 Wochen Belastung reduzieren; Umfang nur bei guter Erholung erhöhen.","individuell steigern"],
+ ["Grundlage stabilisieren","19. Okt – Nov 2026","Aktuell rund 70 km/Woche als Ausgangspunkt (Belastungswochen ca. 67–75 km, Entlastungswochen ca. 53–62 km). Eine kontrollierte Qualitätseinheit, langer Lauf meist 23–26 km; bei Müdigkeit reduzieren, nicht blind auffüllen.","ca. 70 km/Woche"],
+ ["Aufbau & Schwelle","Dez 2026 – Jan 2027","Schwellenblöcke schrittweise ausbauen und Marathonpace dosiert integrieren. Alle 3–4 Wochen Belastung reduzieren; Umfang nur bei guter Erholung erhöhen.","ca. 70 km, nur bei guter Erholung steigern"],
  ["Marathonspezifisch","Februar 2027","Marathonpace in kontrollierten Blöcken, längere Läufe und Verpflegung testen. Keine unnötigen Maximalbelastungen.","Peak nach Verträglichkeit"],
- ["Taper & Rennen","März 2027","Umfang reduzieren, kurze Reize behalten, Schlaf und Verpflegung priorisieren. Exaktes Rennen-Datum vor der letzten Planung bestätigen.","frisch an die Startlinie"]];
+ ["Taper & Rennen","März 2027","Umfang reduzieren, kurze Reize behalten, Schlaf und Verpflegung priorisieren. Marathon am 07.03.2027; Umfang in den letzten drei Wochen gezielt reduzieren.","frisch an die Startlinie"]];
  $("planCards").innerHTML=phases.map(p=>`<article class="phase"><div class="phase-bar"></div><div><h3>${p[0]}</h3><p>${p[1]} · ${p[2]}</p><div class="phase-km">${p[3]}</div></div></article>`).join("");
 }
 function renderLog(){
@@ -87,7 +84,7 @@ function renderLog(){
 function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function renderAll(){showWorkout();renderPlan();renderWeek();renderLog();if(typeof renderExtras==="function")renderExtras();$("weekKm").textContent=km(getWeekKm());$("streak").textContent=`${getStreak()} ${getStreak()===1?"Tag":"Tage"}`}
 document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===b.dataset.tab))}));
-$("exportBtn").addEventListener("click",()=>{const blob=new Blob([JSON.stringify({app:"Marathon Coach",version:"1.9.1",exportedAt:new Date().toISOString(),...state},null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`FORGED-backup-${todayISO()}.json`;a.click();URL.revokeObjectURL(a.href)});
+$("exportBtn").addEventListener("click",()=>{const blob=new Blob([JSON.stringify({app:"Marathon Coach",version:"1.9.3-rebuild",exportedAt:new Date().toISOString(),...state},null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`FORGED-backup-${todayISO()}.json`;a.click();URL.revokeObjectURL(a.href)});
 $("importFile").addEventListener("change",async e=>{const file=e.target.files[0];if(!file)return;try{const data=JSON.parse(await file.text());if(!Array.isArray(data.runs)||!confirm(`Backup mit ${data.runs.length} Läufen importieren und aktuelle Läufe ersetzen?`))return;state={runs:data.runs.filter(r=>r.date&&Number(r.distance)>0).map(r=>({...r,id:r.id||String(Date.now()+Math.random())})),readiness:data.readiness||{},settings:data.settings||{},overrides:data.overrides||{}};save();alert("Backup importiert.")}catch(err){alert("Datei konnte nicht gelesen werden. Bitte ein gültiges Marathon-Coach-JSON-Backup wählen.")}e.target.value=""});
 $("clearBtn").addEventListener("click",()=>{if(confirm("Wirklich alle lokal gespeicherten Läufe und Tagesformdaten löschen? Diese Aktion kann nicht rückgängig gemacht werden.")){state={runs:[],readiness:{},settings:{},overrides:{}};save()}});
 if("serviceWorker" in navigator && location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
