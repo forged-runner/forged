@@ -12,3 +12,9 @@ main{max-width:760px;margin:auto;padding:16px}.hero{padding:24px 20px 18px;borde
 .pro-analysis{border-top:1px solid #8b4a2b;margin-top:16px;padding-top:12px}.pro-analysis h3{color:#ff782f}.interval-table{width:100%;border-collapse:collapse;font-size:13px}.interval-table td,.interval-table th{padding:8px 5px;border-bottom:1px solid #55382a;text-align:left}.saved-analysis{margin-top:10px}.saved-analysis summary{cursor:pointer;color:#ff782f;font-weight:700;padding:7px 0}.saved-analysis p{overflow-wrap:anywhere}.run-info{min-width:0;flex:1}
 
 .change-session{margin-top:10px;font-size:.85rem}#sessionEditPanel{margin:16px 0}#sessionEditPanel label{display:block;margin:12px 0;color:inherit}#sessionEditPanel input,#sessionEditPanel select,#sessionEditPanel textarea{display:block;width:100%;margin-top:5px;padding:10px;border-radius:8px;background:#211e1c;color:#fff;border:1px solid #61564f}#sessionPreview{margin-top:12px}#sessionPreview button{margin-top:8px}
+
+.week-nav-buttons{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0}.week-nav-buttons .btn{padding:10px 9px;font-size:12px}.week-nav-buttons strong{font-size:12px;text-align:center}.week-nav-buttons button:disabled{opacity:.35;cursor:not-allowed}.week-jump-label{display:block;font-size:12px;color:var(--muted)}.week-jump-label select{display:block;width:100%;margin-top:6px;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:#fff}.week-range{color:var(--green);font-weight:700}.week-total{font-weight:700;padding:10px;background:var(--panel);border-radius:9px}
+
+/* FORGED 2.0: Wochenschwerpunkt */
+.week-focus{margin-top:12px;padding:14px 16px;border:1px solid rgba(255,112,34,.45);border-left:4px solid #ff7022;border-radius:10px;background:rgba(255,112,34,.07)}
+.week-focus strong{display:block;color:#ff9a56;font-weight:800}.week-focus p{margin:5px 0 0;line-height:1.45}
