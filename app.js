@@ -17,7 +17,7 @@ function workoutForDate(d=new Date()){
  const phase=d<new Date('2026-12-13')?'base':d<new Date('2027-01-18')?'build':d<new Date('2027-02-15')?'specific':'taper';
  const block=Math.max(0,Math.floor((week-1)/4)), cycle=((week-1)%4+4)%4;
  const recovery=cycle===3;
- const baseKm=recovery?[6,8,8,7,6,18,5]:[6,11,9,10,7,24,5]; // 58 / 72 km
+ const baseKm=recovery?[6,8,8,7,6,18,5]:[6,11,9,10,7,24,5]; // 58 / 72 km before load balancing
  const mk=(type,name,distance,pace,details,purpose)=>({type,name,distance:`${distance} km`,pace,details,purpose,phase});
  const easy=(n,km,why,slow=false)=>mk(slow?'Regeneration':'Aerob',n,km,slow?'5:40–6:10/km':'5:20–5:55/km',`Durchgehend gesprächsfähig laufen. ${why}`,`${why} Schafft aerobe Ausdauer und ermöglicht Anpassung für das Ziel sub 3:20.`);
  let days=[easy('Erholung nach Longrun',baseKm[0],'Sehr locker, kein Tempodruck.',true),null,easy('Lockerer Dauerlauf',baseKm[2],'Keine zweite Qualitätseinheit.'),easy('Aerober Dauerlauf',baseKm[3],'Konstant locker, kontrollierte Atmung.'),easy('Locker vor Longrun',baseKm[4],'Optional 4 × 15 Sekunden lockere Steigerungen nur bei frischen Beinen.'),mk('Longrun',recovery?'Entlasteter Longrun':'Langer lockerer Lauf',baseKm[5],'5:20–5:55/km','Durchgehend locker, Verpflegung und Trinken erproben; keine unvorhergesehenen Tempoblöcke.','Marathonspezifische Ausdauer und Ermüdungsresistenz.'),easy('Kurzer Regenerationslauf',baseKm[6],'Nach dem Longrun ganz locker.',true)];
@@ -29,14 +29,46 @@ function workoutForDate(d=new Date()){
   const v=variants[Math.min(block,3)];days[1]=mk('Schwelle',v[0],baseKm[1],'4:27–4:35/km',`2–3 km einlaufen; ${v[1]} Danach locker auslaufen bis zur Tagesdistanz. Bei Müdigkeit auf 2 × 10 Min kürzen.`,`Schwellenprogression, Stufe ${Math.min(block+1,4)}; die längeren Blöcke werden nur nach guter Verträglichkeit gesteigert.`);
  }else if(cycle===2){
   if(phase==='specific'||phase==='build')days[1]=mk('Marathonpace','2 × 3 km Marathonpace',baseKm[1],'4:44/km','2 km einlaufen, 2 × 3 km @ 4:44/km mit 1 km locker dazwischen, bis zur Tagesdistanz locker auslaufen.','Ökonomisches Laufen im geplanten Marathonrenntempo; keine zusätzliche Schwelle.');
-  else days[1]=easy('Mittellanger aerober Lauf',baseKm[1],'Bewusst keine harte Einheit; Grundlage festigen.');
- }else days[1]=easy('Entlastender Dauerlauf',baseKm[1],'Entlastungswoche: keine harte Einheit.',true);
- if(phase==='specific'&&!recovery&&cycle===2){days[5]=mk('Longrun','Longrun mit dosierter Marathonpace',24,'5:20–5:55/km, MP 4:44/km','16 km locker, dann 2 × 3 km @ 4:44/km mit 1 km locker dazwischen, verbleibend locker. Nur bei guter Erholung; sonst 24 km locker.','Marathonspezifische Ausdauer; Dienstagslauf bleibt in dieser Woche locker.');days[1]=easy('Aerob statt zweiter Qualität',11,'Der Longrun trägt diese Woche die einzige harte Belastung.');}
+  else days[1]=mk('Intervalle','8 × 2 Minuten zügig',baseKm[1],'4:15–4:25/km','2–3 km einlaufen; 8 × 2 Minuten zügig mit je 2 Minuten locker traben; bis zur Tagesdistanz auslaufen. Nicht all-out.','Wöchentlicher kontrollierter Geschwindigkeitsreiz ohne lange Schwellenblöcke.');
+ }else days[1]=mk('Laufökonomie','6 × 20 Sekunden Steigerungen',baseKm[1],'zügig, entspannt','3 km locker, 6 × 20 Sekunden flüssig mit je 100 Sekunden sehr locker; Rest locker. Kein Sprint.','Kleiner neuromuskulärer Reiz in der Entlastungswoche ohne nennenswerte Ermüdung.');
+ // Longruns mit periodisiertem Trainingszweck statt identischer Dauerpace.
+ // Bei intensiven Longruns wird die Dienstagsbelastung reduziert.
+ if(!recovery && phase!=='taper'){
+  if(cycle===1){
+   days[5]=mk('Longrun','Progressiver Longrun',24,'5:45 → 4:55/km','14 km locker bei 5:30–5:50/km, 6 km allmählich von 5:20 auf 5:00/km, 4 km kontrolliert bei 4:55–5:05/km. Keine Schwelle, bei Müdigkeit alles locker.','Verbessert Laufökonomie unter Ermüdung ohne Marathonpace zu erzwingen.');
+   days[1]=mk('Laufökonomie','6 × 20 Sekunden Steigerungen',9,'zügig, entspannt','3 km locker; 6 × 20 Sekunden locker schnell mit je 100 Sekunden Trabpause; Rest locker.','Der progressive Longrun ist die Hauptbelastung dieser Woche.');
+  }else if(cycle===2 && phase==='base'){
+   days[5]=mk('Longrun','Longrun mit moderatem Endteil',24,'locker, letzte 5 km 5:00–5:10/km','19 km locker 5:25–5:55/km; letzte 5 km 5:00–5:10/km, nur bei frischen Beinen.','Aerobe Ermüdungsresistenz; bewusst langsamer als Marathonpace.');
+   days[1]=mk('Laufökonomie','6 × 20 Sekunden Steigerungen',9,'zügig, entspannt','3 km locker; 6 × 20 Sekunden flüssig, je 100 Sekunden locker; auslaufen.','Longrun trägt den stärkeren Ausdauerreiz.');
+  }else if(cycle===0 && phase==='specific'){
+   days[5]=mk('Longrun','Marathon-Simulation mit 2 × 4 km MP',26,'locker und 4:44/km','8 km locker, 4 km @ 4:44/km, 2 km locker, 4 km @ 4:44/km, 8 km locker. Nur bei guter Erholung; sonst durchgehend locker.','Marathonpace unter Vorermüdung üben, inklusive Verpflegung.');
+   days[1]=mk('Laufökonomie','6 × 20 Sekunden Steigerungen',9,'zügig, entspannt','3 km locker; 6 × 20 Sekunden mit je 100 Sekunden locker; auslaufen.','Keine zwei umfangreichen harten Einheiten in der Woche.');
+  }
+ }
+ if(phase==='specific'&&!recovery&&cycle===2){days[5]=mk('Longrun','Longrun mit dosierter Marathonpace',24,'5:20–5:55/km, MP 4:44/km','15 km locker, 3 km @ 4:44/km, 1 km locker, 3 km @ 4:44/km, 2 km locker. Nur bei guter Erholung; sonst 24 km locker.','Marathonspezifische Ausdauer; Dienstagslauf bleibt in dieser Woche locker.');days[1]=easy('Aerob statt zweiter Qualität',11,'Der Longrun trägt diese Woche die einzige harte Belastung.');}
  if(phase==='taper'){
   const daysToRace=Math.round((dateObj('2027-03-07')-d)/86400000);
   if(daysToRace>=14){days=[easy('Regeneration',6,'Sehr locker.',true),mk('Marathonpace','2 × 2 km Marathonpace',10,'4:44/km','3 km locker, 2 × 2 km @ 4:44/km mit 1 km Trabpause, restliche Strecke locker.','Kurzer kontrollierter Reiz bei sinkendem Umfang.'),easy('Locker',8,'Taper: Umfang senken.'),easy('Aerob',9,'Frische bewahren.'),easy('Locker',6,'Keine Ermüdung aufbauen.'),mk('Longrun','Letzter reduzierter Longrun',18,'5:25–5:55/km','Locker, ohne Endbeschleunigung.','Erhaltung der Ausdauer bei abnehmender Ermüdung.'),easy('Regeneration',5,'Locker erholen.',true)];}
   else if(daysToRace>=7){days=[easy('Regeneration',5,'Frische aufbauen.',true),mk('Marathonpace','3 × 1 km Marathonpace',8,'4:44/km','2 km einlaufen; 3 × 1 km @ 4:44/km mit 500 m Trabpause; locker auslaufen.','Rhythmus bewahren, keine Ermüdung.'),easy('Locker',7,'Taper.',true),easy('Locker',7,'Taper.'),easy('Locker',5,'Taper.',true),mk('Longrun','Kurzer lockerer Lauf',12,'5:30–6:00/km','Kein Tempo.','Bewegung erhalten.'),easy('Regeneration',4,'Sehr locker.',true)];}
   else {days=[easy('Sehr locker',5,'Rennwoche.',true),mk('Aktivierung','4 × 1 Minute kontrolliert',6,'etwa Marathonpace','2 km locker, 4 × 1 Min @ Marathonpace mit 2 Min locker, auslaufen. Kein harter Reiz.','Locker bleiben.'),easy('Locker',6,'Rennwoche.',true),easy('Locker',5,'Rennwoche.',true),easy('Locker',4,'Rennwoche.',true),easy('Optionaler Shakeout',3,'Nur falls erholsam.',true),mk('Wettkampf','Ascona-Locarno Marathon',42.195,'ca. 4:44/km','Ruhiger Start, gleichmässige Verpflegung, Ziel sub 3:20.','Saisonhöhepunkt.')];}
+ }
+ // Prioritaet: Formtests ersetzen Qualitaet; sie kommen nie oben auf eine normale Belastungswoche.
+ if(key>='2026-12-07'&&key<='2026-12-13'){
+  days[1]=easy('Locker vor Michi-Test',8,'Kein weiteres Intervall- oder Schwellentraining in dieser Woche.',true);
+  days[3]=easy('Locker vor Michi-Test',8,'Belastung fuer Samstag sparen.',true);
+  days[6]=easy('Sehr locker nach Testlauf',5,'Keinen zweiten Longrun laufen.',true);
+ }
+ if(key>='2027-01-11'&&key<='2027-01-17'){
+  days[1]=mk('Aktivierung','5 × 20 Sekunden Steigerungen',8,'locker mit kurzen Steigerungen','2 km locker, 5 × 20 Sekunden kontrolliert schnell, jeweils 100 Sekunden traben, auslaufen. Kein Schwellentraining.','Bewegungsqualitaet vor dem 10-km-Rennen.');
+  days[5]=easy('Sehr locker vor 10-km-Lauf',5,'Kraefte fuer den Wettkampf sparen.',true);
+ }
+ // Volumen nach Aenderungen am Longrun ausgleichen, nicht unbemerkt ueber 70–74 km steigen.
+ // Ausschliesslich einen lockeren Mittwoch anpassen, nie eine Qualitaetseinheit verlaengern.
+ if(phase!=='taper' && !(key>='2026-12-07'&&key<='2026-12-13') && !(key>='2027-01-11'&&key<='2027-01-17')){
+  const target=recovery?58:72;
+  const total=days.reduce((sum,w)=>sum+parseFloat(w.distance),0);
+  const newWednesday=Math.max(5,Math.round((parseFloat(days[2].distance)+target-total)*10)/10);
+  days[2]=easy('Lockerer Dauerlauf',newWednesday,'Umfangsausgleich fuer den Wochenplan; keine zusaetzliche Intensitaet.');
  }
  if(key==='2027-03-07')return mk('Wettkampf','Ascona-Locarno Marathon',42.195,'ca. 4:44/km','Kontrollierter Start, gleichmässige Verpflegung; Ziel sub 3:20.','Saisonhöhepunkt.');
  if(key>='2026-12-07'&&key<='2026-12-11'&&day===1)return easy('Locker vor Testlauf',9,'Kein zusätzliches Schwellentraining in der Testwoche.');
