@@ -1,4 +1,4 @@
-const CACHE="forged-v201-load-20261023";
+const CACHE="forged-v204-analyze-20261024";
 const ASSETS=["./","./index.html","./styles.css","./app.js","./analyze-pro.js","./activity.js","./features.js","./manifest.webmanifest","./icons/icon-192.png","./icons/icon-512.png"];
 self.addEventListener("install",event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener("activate",event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
